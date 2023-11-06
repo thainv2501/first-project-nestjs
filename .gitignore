@@ -1,20 +1,19 @@
 # compiled output
 /dist
 /node_modules
+# package-lock.json
+# yarn.lock
 
 # Logs
 logs
 *.log
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
 # OS
 .DS_Store
-
-.env
 
 # Tests
 /coverage
@@ -35,3 +34,16 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Code
+# src/config/config.development.*
+# src/config/config.production.*
+docs/sample/mysql/
+
+# environment
+.env
+.env.production
+
+# Dev data
+/__data/
+.env
