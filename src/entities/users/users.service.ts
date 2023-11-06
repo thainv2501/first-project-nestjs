@@ -1,11 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto){
+    const duplicatedUser = await this.userRepository.findOneBy({email : createUserDto.email})
+    if(duplicatedUser){
+      throw new BadRequestException(`This user is created`);
+    }
+    const user = await this.userRepository.create(createUserDto) 
+    return await this.userRepository.save(user);
   }
 
   findAll() {
@@ -20,7 +34,7 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(email: string) {
+    return await this.userRepository.delete({email}) 
   }
 }

@@ -1,10 +1,10 @@
-import { PrimaryGeneratedColumn, Entity ,Column} from 'typeorm';
+import { PrimaryGeneratedColumn, Entity ,Column, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 
 @Entity()
 export abstract class baseEntity {
-    @Column({ type: 'timestamp' }) 
-    createdDate: Date
+    @CreateDateColumn({type : "timestamptz"})
+    created_at: Date; // Creation date
 
-    @Column({ type: 'timestamp' }) 
-    updatedDate: Date
+    @UpdateDateColumn({type : "timestamptz"})
+    updated_at: Date; // Last updated date
 }
