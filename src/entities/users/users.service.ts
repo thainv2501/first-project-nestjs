@@ -1,10 +1,16 @@
+import { ChangeUserPasswordDto } from './dto/change-password-user.dto';
+import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
+import { VerifyUserDto } from './dto/verify-user.dto';
+import { SignInUserDto } from '../../auth/dto/sign-in-user.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import * as bcrypt from 'bcrypt';
+import { Status } from 'src/utility/common/user-status.enum';
+import { json } from 'stream/consumers';
 @Injectable()
 export class UsersService {
 
@@ -18,20 +24,83 @@ export class UsersService {
     if(duplicatedUser){
       throw new BadRequestException(`This user is created`);
     }
+    createUserDto.password = await bcrypt.hash(createUserDto.password,10)
     const user = await this.userRepository.create(createUserDto) 
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user)
+    delete user.password
+    return user;
   }
 
+
+  async verifyUser(verifyUserDto: VerifyUserDto){
+    const foundUser = await this.userRepository.findOneBy({email : verifyUserDto.email})
+    if(!foundUser || verifyUserDto.verify_token !== "111111"){
+      throw new BadRequestException(`Something went wrong !`);
+    }
+    const updatedUser = await this.userRepository.update({email : verifyUserDto.email},{status : Status.Active})  
+    return updatedUser;
+  }
+
+  async getResetPasswordToken(email : string){
+    if(!email){
+      throw new BadRequestException("Something went wrong with the request")
+    }
+    const foundUser = await this.userRepository.findOneBy({email})
+    if(!foundUser){
+      throw new BadRequestException("Something went wrong with the request")
+    }
+    const token = await bcrypt.hash(foundUser.email + process.env.ACCESS_SECRET_TOKEN,10)
+    return token;
+  }
+
+  async resetPassword(resetPasswordUserDto : ResetPasswordUserDto){
+    if(resetPasswordUserDto.password !== resetPasswordUserDto.confirmPassword){
+      throw new BadRequestException('New password do not match !')
+    }
+    const foundUser = await this.userRepository.findOneBy({email : resetPasswordUserDto.email})
+    if(!foundUser){
+      throw new BadRequestException("Something went wrong with the request")
+    }
+    const tokenMatch = await bcrypt.compare(foundUser.email + process.env.ACCESS_SECRET_TOKEN,resetPasswordUserDto.resetToken)
+    if(!tokenMatch){
+      throw new BadRequestException('Token not match,Request denied !')
+    }
+    const newPassword = await bcrypt.hash(resetPasswordUserDto.password , 10)
+    await this.userRepository.update({id : foundUser.id} , {password : newPassword})
+    return {status : 200 , message : "Password reset"}    
+  }
+
+ 
   findAll() {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(email: string) {
+    const foundUser = await this.userRepository.findOneBy({email})
+    return {foundUser}
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id : string, updateUserDto: UpdateUserDto) {
+    const foundUser = await this.userRepository.findOneBy({id})
+    if(!foundUser){
+      throw new BadRequestException("No user found")
+    }
+    await this.userRepository.update({id : foundUser.id} , updateUserDto)
+
+    return `This action updates a # ${foundUser.email } user`;
+  }
+
+  async changePassword(id : string, changeUserPasswordDto: ChangeUserPasswordDto) {
+    const foundUser = await this.userRepository.findOneBy({id})
+    if(!foundUser){
+      throw new BadRequestException("No user found")
+    }
+    if(!changeUserPasswordDto.password || changeUserPasswordDto.password === changeUserPasswordDto.newPassword){
+      throw new BadRequestException("Change Password fail")
+    }
+    await this.userRepository.update({id : foundUser.id} , {password : changeUserPasswordDto.newPassword})
+
+    return `This action change password # ${foundUser.email} user`;
   }
 
   async remove(email: string) {

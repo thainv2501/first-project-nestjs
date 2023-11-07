@@ -15,8 +15,8 @@ export class Photo extends baseEntity {
     @ManyToOne(() => User, (user) => user.id)
     user: User
 
-    @OneToMany(() => Album, (album) => album.id)
-    album : Album[]
+    // @OneToMany(() => Album, (album) => album.id)
+    // album : Album[]
 
     @Column()
     link : string

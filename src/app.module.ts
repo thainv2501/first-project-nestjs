@@ -6,8 +6,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { config } from './config';
 import { DatabaseConfig } from './db/data.config';
+import { AuthModule } from './auth/auth.module';
+import { configData } from './config';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guard/auth.guard';
 
 
 
@@ -15,7 +18,8 @@ import { DatabaseConfig } from './db/data.config';
   imports: [
     ConfigModule.forRoot({
     isGlobal: true,
-    load : [config]
+    ignoreEnvFile: true,
+    load : [configData]
   }),
   TypeOrmModule.forRoot({
     type: 'postgres',
@@ -30,8 +34,9 @@ import { DatabaseConfig } from './db/data.config';
 }),
   UsersModule,
   PhotoModule,
-  AlbumModule],
+  AlbumModule,
+  AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService,],
 })
 export class AppModule {}

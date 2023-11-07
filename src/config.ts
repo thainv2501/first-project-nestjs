@@ -1,4 +1,6 @@
-export const config = () => ({
+import { config } from 'dotenv';
+config()
+export const configData = () => ({
     database :  {
         type: 'postgres',
         host: 'localhost',
@@ -9,4 +11,5 @@ export const config = () => ({
         entities: [],
         synchronize: true,
     },
+    access_token : process.env.ACCESS_TOKEN_SECRET,
 })
