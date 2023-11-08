@@ -26,7 +26,7 @@ export class UsersController {
     return this.usersService.verifyUser(verifyUserDto)
   }
 
-  @Get('getResetPasswordRequest')
+  @Get('getResetPasswordToken')
   @ApiCreatedResponse({description : "get a token !"})
   @ApiBadRequestResponse({description : "create token fail !  ,..."})
   getResetPasswordToken(@Body('email') email: string){

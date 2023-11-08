@@ -1,7 +1,7 @@
 import { AlbumModule } from './entities/album/album.module';
 import { PhotoModule } from './entities/photo/photo.module';
 import { UsersModule } from './entities/users/users.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,7 +10,9 @@ import { DatabaseConfig } from './db/data.config';
 import { AuthModule } from './auth/auth.module';
 import { configData } from './config';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './guard/auth.guard';
+import { AuthGuard } from './utility/guard/auth.guard';
+import { JwtService } from '@nestjs/jwt';
+import { AuthMiddleware } from './utility/middleware/auth.middleware';
 
 
 
@@ -37,6 +39,17 @@ import { AuthGuard } from './guard/auth.guard';
   AlbumModule,
   AuthModule],
   controllers: [AppController],
-  providers: [AppService,],
+  providers: [AppService,JwtService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+    .apply(AuthMiddleware)
+    .exclude(
+      { path: 'users/getResetPasswordToken', method: RequestMethod.GET },
+      { path: 'users/resetPassword', method: RequestMethod.PATCH },
+      { path: 'users', method: RequestMethod.POST },
+    )
+    .forRoutes("*");
+  }
+}
