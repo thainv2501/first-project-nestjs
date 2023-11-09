@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, ManyToMany, JoinTable } from "typeorm"
 import { baseEntity } from "src/utility/common/base.entity";
 import { Status } from "src/utility/common/user-status.enum";
 import { User } from "src/entities/users/entities/user.entity";
@@ -15,8 +15,13 @@ export class Photo extends baseEntity {
     @ManyToOne(() => User, (user) => user.id)
     user: User
 
-    // @OneToMany(() => Album, (album) => album.id)
-    // album : Album[]
+    @ManyToMany(() => Album , (album)=> album.photos)
+    @JoinTable({
+        name: 'album_photo',
+        joinColumn: { name: 'photo_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'album_id' },
+      })
+    albums: Album[]
 
     @Column()
     link : string

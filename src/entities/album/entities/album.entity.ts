@@ -18,12 +18,20 @@ export class Album extends baseEntity {
     @Column({type : "enum", enum : Status , default : Status.Active})
     status : Status
 
-    @ManyToMany(() => User)
-    @JoinTable()
-    userId: User[]
+    @ManyToMany(() => User , (user) => user.albums)
+    @JoinTable({
+        name: 'user_album',
+        joinColumn: { name: 'album_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'user_id' },
+      })
+    users: User[]
 
-    @ManyToMany(() => Photo)
-    @JoinTable()
+    @ManyToMany(() => Photo , (photo)=> photo.albums)
+    @JoinTable({
+        name: 'album_photo',
+        joinColumn: { name: 'album_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'photo_id' },
+      })
     photos: Photo[]
 
 }

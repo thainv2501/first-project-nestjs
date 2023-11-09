@@ -15,16 +15,16 @@ export class AuthMiddleware implements NestMiddleware {
         const payload = await this.jwtService.verifyAsync(
           token,
           {
-            secret: process.env.ACCESS_SECRET_TOKEN
+            secret: process.env.ACCESS_TOKEN_SECRET
           }
         );
         // 💡 We're assigning the payload to the request object here
         // so that we can access it in our route handlers
-        req['user'] = payload;
-      } catch {
-        throw new UnauthorizedException();
+        req['user'] = payload.foundUser;
+      } catch (error) {
+        throw new UnauthorizedException(`${error}`);
       }
-      return true;
+      next();
     }
   
     private extractTokenFromHeader(request: Request): string | undefined {

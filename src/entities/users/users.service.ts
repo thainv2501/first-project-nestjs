@@ -98,7 +98,8 @@ export class UsersService {
     if(!changeUserPasswordDto.password || changeUserPasswordDto.password === changeUserPasswordDto.newPassword){
       throw new BadRequestException("Change Password fail")
     }
-    await this.userRepository.update({id : foundUser.id} , {password : changeUserPasswordDto.newPassword})
+    const newPassword = await bcrypt.hash(changeUserPasswordDto.newPassword , 10)
+    await this.userRepository.update({id : foundUser.id} , {password : newPassword})
 
     return `This action change password # ${foundUser.email} user`;
   }
