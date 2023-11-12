@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import { IConfig } from './IConfig';
+import { IConfig } from './interface/IConfig';
 config()
 export const configData = () : IConfig  => ({
     database :  {
@@ -11,6 +11,7 @@ export const configData = () : IConfig  => ({
         database:  process.env.DATABASE_NAME,
         entities: [],
         synchronize: true,
+        autoLoadEntities : true,
 
     },
     access_token : process.env.ACCESS_TOKEN_SECRET,

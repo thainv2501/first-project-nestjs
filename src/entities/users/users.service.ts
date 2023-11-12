@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Status } from 'src/utility/common/user-status.enum';
 import { json } from 'stream/consumers';
@@ -75,19 +75,23 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  async findOne(email: string) {
-    const foundUser = await this.userRepository.findOneBy({email})
-    return {foundUser}
+  async getUser(
+    fields: FindOptionsWhere<User> | FindOptionsWhere<User>[],
+    relationOptions?: string[],
+  ): Promise<User> {
+    return await this.userRepository.findOne({
+      where: fields,
+      relations: relationOptions,
+    });
   }
 
-  async update(id : string, updateUserDto: UpdateUserDto) {
-    const foundUser = await this.userRepository.findOneBy({id})
+  async update(email : string, updateUserDto: UpdateUserDto) {
+    const foundUser = await this.userRepository.findOneBy({email})
     if(!foundUser){
       throw new BadRequestException("No user found")
     }
-    await this.userRepository.update({id : foundUser.id} , updateUserDto)
-
-    return `This action updates a # ${foundUser.email } user`;
+    await this.userRepository.update({email : foundUser.email} , updateUserDto)
+    return ` updated ${foundUser.email}`;
   }
 
   async changePassword(id : string, changeUserPasswordDto: ChangeUserPasswordDto) {

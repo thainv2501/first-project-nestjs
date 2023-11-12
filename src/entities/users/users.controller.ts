@@ -43,13 +43,13 @@ export class UsersController {
 
 
   @Get(':email')
-  findOne(@Param('email') email: string) {
-    return this.usersService.findOne(email);
+  getUser(@Param('email') email: string) {
+    return this.usersService.getUser({email});
   }
 
-  @Patch(':id')
-  update(@Param('id') id : string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  @Patch(':email')
+  update(@Param('email') email : string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(email, updateUserDto);
   }
 
   @Patch('changePassword/:id')

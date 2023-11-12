@@ -12,13 +12,13 @@ export class Album extends baseEntity {
     @Column()
     name : string
 
-    @Column()
+    @Column({default : ""})
     description : string
 
     @Column({type : "enum", enum : Status , default : Status.Active})
     status : Status
 
-    @ManyToMany(() => User , (user) => user.albums)
+    @ManyToMany(() => User ,{ onDelete: 'CASCADE' }, )
     @JoinTable({
         name: 'user_album',
         joinColumn: { name: 'album_id', referencedColumnName: 'id' },
@@ -26,12 +26,15 @@ export class Album extends baseEntity {
       })
     users: User[]
 
-    @ManyToMany(() => Photo , (photo)=> photo.albums)
+    @ManyToMany(() => Photo)
     @JoinTable({
         name: 'album_photo',
         joinColumn: { name: 'album_id', referencedColumnName: 'id' },
         inverseJoinColumn: { name: 'photo_id' },
       })
     photos: Photo[]
+
+    @Column()
+    createdBy : string
 
 }

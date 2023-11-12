@@ -15,14 +15,6 @@ export class Photo extends baseEntity {
     @ManyToOne(() => User, (user) => user.id)
     user: User
 
-    @ManyToMany(() => Album , (album)=> album.photos)
-    @JoinTable({
-        name: 'album_photo',
-        joinColumn: { name: 'photo_id', referencedColumnName: 'id' },
-        inverseJoinColumn: { name: 'album_id' },
-      })
-    albums: Album[]
-
     @Column()
     link : string
 

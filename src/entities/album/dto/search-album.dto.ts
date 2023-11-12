@@ -1,17 +1,16 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateAlbumDto } from './create-album.dto';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, isNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from 'src/utility/common/user-status.enum';
-import { Photo } from 'src/entities/photo/entities/photo.entity';
-import { User } from 'src/entities/users/entities/user.entity';
-import { Type } from 'class-transformer';
+import { PageOptionsDto } from 'src/utility/common/pageOptions.dto';
 
-export class UpdateAlbumDto extends PartialType(CreateAlbumDto) {
+
+export class SearchAlbumDto extends PageOptionsDto {
     @IsString()
+    @IsOptional()
     name? : string
 
     @IsString()
+    @IsOptional()
     description?: string
 
     @ApiProperty({ enum: [Status.Active , Status.Inactive]})
@@ -34,4 +33,5 @@ export class UpdateAlbumDto extends PartialType(CreateAlbumDto) {
     @IsOptional()
     @IsString()
     user : string
+
 }
